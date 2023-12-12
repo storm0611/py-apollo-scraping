@@ -192,7 +192,8 @@ def filter(driver: uc.Chrome, query: str):
         EC.presence_of_element_located((By.CSS_SELECTOR, 'div.finder-results-list-panel-content > div > div > div > div > div:last-child > div > div > span'))
     )
     count = int(element.text.split("of ")[1].replace(",", ""))
-    max_page_num = int(ceil(count / 25)) if ceil(count / 25) <= 5 else 5
+    # max_page_num = int(ceil(count / 25)) if ceil(count / 25) <= 5 else 5
+    max_page_num = int(ceil(count / 25))
     print("max_page_num = ", max_page_num)
     skip = 0
     i = 0
