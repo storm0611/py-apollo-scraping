@@ -10,11 +10,11 @@ import os
 import undetected_chromedriver as uc
 from math import ceil
 import openpyxl
-from .database import my_sqlite
+from database import my_sqlite
 
 load_dotenv()
 
-pids = []
+# pids = []
 data = []
 TIMEOUT = 10
 
@@ -76,6 +76,57 @@ def export():
         workbook.close()
     except Exception as err:
         print(str(err))
+
+def export_one(data):
+
+    filename = 'data.xlsx'
+    save_dir = './csv'
+    filepath = os.path.join(save_dir, filename)
+    if os.path.exists(filepath):
+        workbook = openpyxl.load_workbook(filepath)
+        worksheet = workbook.active
+    else:
+        workbook = openpyxl.Workbook()
+        worksheet = workbook.active
+        worksheet['A1'] = 'ID'
+        worksheet['B1'] = 'Name'
+        worksheet['C1'] = 'Personal LinkedIn'
+        worksheet['D1'] = 'Email'
+        worksheet['E1'] = 'Job Title'
+        worksheet['F1'] = 'Person Apollo Link'
+        worksheet['G1'] = 'Company Name'
+        worksheet['H1'] = 'Company Apollo Link'
+        worksheet['I1'] = 'Company Website'
+        worksheet['J1'] = 'Company LinkedIn'
+        worksheet['K1'] = 'Company Twitter'
+        worksheet['L1'] = 'Company Facebook'
+        worksheet['M1'] = 'Location'
+        worksheet['N1'] = 'Employees'
+        worksheet['O1'] = 'Industry'
+        worksheet['P1'] = 'Keywords'
+
+    start_row = worksheet.max_row + 1
+
+    worksheet.cell(row=start_row, column=1).value = data["person_id"]
+    worksheet.cell(row=start_row, column=2).value = data["name"]
+    worksheet.cell(row=start_row, column=3).value = '=HYPERLINK("{}")'.format(data["person_linkedin"])
+    worksheet.cell(row=start_row, column=4).value = data["email"]
+    worksheet.cell(row=start_row, column=5).value = data["job_title"]
+    worksheet.cell(row=start_row, column=6).value = '=HYPERLINK("{}")'.format(data["person_link"])
+    worksheet.cell(row=start_row, column=7).value = data["company_name"]
+    worksheet.cell(row=start_row, column=8).value = '=HYPERLINK("{}")'.format(data["company_link"])
+    worksheet.cell(row=start_row, column=9).value = '=HYPERLINK("{}")'.format(data["company_website"])
+    worksheet.cell(row=start_row, column=10).value = '=HYPERLINK("{}")'.format(data["company_linkedin"])
+    worksheet.cell(row=start_row, column=11).value = '=HYPERLINK("{}")'.format(data["company_twitter"])
+    worksheet.cell(row=start_row, column=12).value = '=HYPERLINK("{}")'.format(data["company_facebook"])
+    worksheet.cell(row=start_row, column=13).value = data["location"]
+    worksheet.cell(row=start_row, column=14).value = data["employees"]
+    worksheet.cell(row=start_row, column=15).value = data["industry"]
+    worksheet.cell(row=start_row, column=16).value = ",".join(data["keywords"])
+
+    # Save the workbook
+    workbook.save(filepath)
+    workbook.close()
 
 def signup(driver: uc.Chrome):
     driver.get("https://www.apollo.io/sign-up")
@@ -236,7 +287,7 @@ def filter(driver: uc.Chrome, query: str):
                             keyword = sub_col.text.replace(",", "")
                             if keyword != "":
                                 keywords.append(keyword)
-            data.append({
+            export_one({
                 "person_id": person_id,
                 "name": name,
                 "person_linkedin": person_linkedin,
@@ -254,6 +305,24 @@ def filter(driver: uc.Chrome, query: str):
                 "industry": industry,
                 "keywords": keywords,
             })
+            # data.append({
+            #     "person_id": person_id,
+            #     "name": name,
+            #     "person_linkedin": person_linkedin,
+            #     "email": email,
+            #     "job_title": title,
+            #     "person_link": person_link,
+            #     "company_name": company_name,
+            #     "company_link": company_link,
+            #     "company_website": company_website,
+            #     "company_linkedin": company_linkedin,
+            #     "company_twitter": company_twitter,
+            #     "company_facebook": company_facebook,
+            #     "location": location,
+            #     "employees": employees,
+            #     "industry": industry,
+            #     "keywords": keywords,
+            # })
             print({
                 "person_id": person_id,
                 "name": name,
@@ -274,7 +343,7 @@ def filter(driver: uc.Chrome, query: str):
             })
 
 if __name__ == "__main__":
-    try:
+    # try:
         options = webdriver.ChromeOptions()
         options.headless = False
         driver = uc.Chrome(options=options)
@@ -282,7 +351,7 @@ if __name__ == "__main__":
         login(driver)
         filter(driver, "personTitles[]=owner&personTitles[]=founder&personTitles[]=ceo&personTitles[]=director&personTitles[]=c%20suite&personTitles[]=partner&personTitles[]=head%20of%20sales&personTitles[]=cmo&personTitles[]=cfo&personTitles[]=head%20of%20marketing&personTitles[]=operations%20director&personTitles[]=vp%20of%20development&personTitles[]=VP&personLocations[]=United%20Kingdom&organizationIndustryTagIds[]=5567e1887369641d68d40100&contactEmailStatus[]=verified")
         driver.quit()
-    except:
-        pass
-    export()
-    time.sleep(3)
+    # except Exception as error:
+        # print(error)
+    # export()
+    # time.sleep(3)

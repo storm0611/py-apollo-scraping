@@ -1,5 +1,4 @@
 import sqlite3
-from sqlite3 import Connection
 
 class SQLite:
 
@@ -17,10 +16,11 @@ class SQLite:
     def create_table(self):
         cursor = self.conn.cursor()
         cursor.execute(f"CREATE TABLE IF NOT EXISTS {self.table_name} (id INTEGER PRIMARY KEY, pid TEXT)")
+        self.conn.commit()
 
     def insert(self, pid: str):
         cursor = self.conn.cursor()
-        cursor.execute(f"INSERT INTO {self.table_name} (pid) VALUES (?)", (pid))
+        cursor.execute(f"INSERT INTO {self.table_name} (pid) VALUES ('{pid}')")
         self.conn.commit()
 
     def select(self, pid: str):
