@@ -231,7 +231,7 @@ def filter(driver: uc.Chrome, query: str):
                     except:
                         button = columns[6].find_element(By.CSS_SELECTOR, 'button')
                         button.click()
-                        time.sleep(5)
+                        time.sleep(3)
                         try:
                             element = columns[6].find_element(By.CSS_SELECTOR, 'a.zp-link')
                             email = element.text
