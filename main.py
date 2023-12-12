@@ -344,6 +344,7 @@ def filter(driver: uc.Chrome, query: str):
                 })
 
 if __name__ == "__main__":
+    while True:
     # try:
         options = webdriver.ChromeOptions()
         options.headless = False
