@@ -1,28 +1,16 @@
 from selenium import webdriver
-from selenium.webdriver.firefox.service import Service as firefoxService
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.common.by import By
 import time
-import json
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.select import Select
-from selenium.webdriver.common.keys import Keys
-import re
 from datetime import datetime
-import certifi
-import random
 from dotenv import load_dotenv
 import os
-import smtplib
-import ssl
-import threading
-import random
 import undetected_chromedriver as uc
 from math import ceil
 import openpyxl
+from .database import my_sqlite
 
 load_dotenv()
 
@@ -196,10 +184,12 @@ def filter(driver: uc.Chrome, query: str):
                             person_link = link
                             name = sub_col.text
                             person_id = link.split("/")[-1].strip()
-                            if person_id in pids:
+                            if len(my_sqlite.select(pid=person_id)):
+                            # if person_id in pids:
                                 skip = 1
                                 break
-                            pids.append(person_id)
+                            my_sqlite.insert(pid=person_id)
+                            # pids.append(person_id)
                     if skip:
                         break
                 elif j == 1:
