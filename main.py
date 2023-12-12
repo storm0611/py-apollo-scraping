@@ -225,6 +225,7 @@ def filter(driver: uc.Chrome, query: str):
             employees = "Not Found"
             industry = "Not Found"
             email = "Not Found"
+            phone_number = "Not Found"
             keywords = []
             columns = element.find_elements(By.TAG_NAME, 'td')
             for j in range(len(columns)):
@@ -270,20 +271,56 @@ def filter(driver: uc.Chrome, query: str):
                 elif j == 6:
                     try:
                         element = columns[6].find_element(By.CSS_SELECTOR, 'a.zp-link')
-                        email = element.text
+                        if "@" in element.text:
+                            email = element.text
+                        else:
+                            phone_number = element.text
+                            button = columns[3].find_element(By.CSS_SELECTOR, 'button')
+                            try:
+                                button.find_element(By.CSS_SELECTOR, 'div[data-elem="button-label"]').text
+                            except:
+                                button.click()
+                                time.sleep(3)
+                                try:
+                                    element = WebDriverWait(driver, TIMEOUT).until(
+                                        EC.presence_of_element_located((By.CSS_SELECTOR, 'div.apolloio-css-vars-reset div.apolloio-css-vars-reset span.zp_t08Bv'))
+                                    )
+                                    email = element.text
+                                except:
+                                    pass
                     except:
                         button = columns[6].find_element(By.CSS_SELECTOR, 'button')
-                        button.click()
-                        time.sleep(3)
                         try:
-                            element = columns[6].find_element(By.CSS_SELECTOR, 'a.zp-link')
-                            email = element.text
+                            button.find_element(By.CSS_SELECTOR, 'div[data-elem="button-label"]').text
+                            button.click()
+                            time.sleep(3)
+                            try:
+                                element = columns[6].find_element(By.CSS_SELECTOR, 'a.zp-link')
+                                if "@" in element.text:
+                                    email = element.text
+                                else:
+                                    phone_number = element.text
+                                    button = columns[3].find_element(By.CSS_SELECTOR, 'button')
+                                    try:
+                                        button.find_element(By.CSS_SELECTOR, 'div[data-elem="button-label"]').text
+                                    except:
+                                        button.click()
+                                        time.sleep(3)
+                                        try:
+                                            element = WebDriverWait(driver, TIMEOUT).until(
+                                                EC.presence_of_element_located((By.CSS_SELECTOR, 'div.apolloio-css-vars-reset div.apolloio-css-vars-reset span.zp_t08Bv'))
+                                            )
+                                            email = element.text
+                                        except:
+                                            pass
+                            except:
+                                pass
                         except:
                             pass
                 elif j == 7:
                     industry = columns[7].find_element(By.CSS_SELECTOR, 'div.zp_paOF8 > span:first-child').text.split(',')[0]
                 elif j == 8:
-                    sub_cols = columns[8].find_elements(By.CSS_SELECTOR, 'div.zp_HlgrG span')
+                    sub_cols = columns[8].find_elements(By.CSS_SELECTOR, 'div.zp_HlgrG > span')
                     if len(sub_cols):
                         for sub_col in sub_cols:
                             keyword = sub_col.text.replace(",", "")
