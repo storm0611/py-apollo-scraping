@@ -155,8 +155,9 @@ def filter(driver: uc.Chrome, query: str):
     max_page_num = int(ceil(count / 25)) if ceil(count / 25) <= 5 else 5
     print("max_page_num = ", max_page_num)
     skip = 0
-    i = 1
+    i = 0
     while i <= max_page_num:
+        i += 1
         print("current page = ", i)
         driver.get(f"{url}&page={i}")
         element = WebDriverWait(driver, TIMEOUT).until(
@@ -283,12 +284,15 @@ def filter(driver: uc.Chrome, query: str):
             })
 
 if __name__ == "__main__":
-    options = webdriver.ChromeOptions()
-    options.headless = False
-    driver = uc.Chrome(options=options)
-    driver.maximize_window()
-    login(driver)
-    filter(driver, "personTitles[]=owner&personTitles[]=founder&personTitles[]=ceo&personTitles[]=director&personTitles[]=c%20suite&personTitles[]=partner&personTitles[]=head%20of%20sales&personTitles[]=cmo&personTitles[]=cfo&personTitles[]=head%20of%20marketing&personTitles[]=operations%20director&personTitles[]=vp%20of%20development&personTitles[]=VP&personLocations[]=United%20Kingdom&organizationIndustryTagIds[]=5567e1887369641d68d40100&contactEmailStatus[]=verified")
-    driver.quit()
+    try:
+        options = webdriver.ChromeOptions()
+        options.headless = False
+        driver = uc.Chrome(options=options)
+        driver.maximize_window()
+        login(driver)
+        filter(driver, "personTitles[]=owner&personTitles[]=founder&personTitles[]=ceo&personTitles[]=director&personTitles[]=c%20suite&personTitles[]=partner&personTitles[]=head%20of%20sales&personTitles[]=cmo&personTitles[]=cfo&personTitles[]=head%20of%20marketing&personTitles[]=operations%20director&personTitles[]=vp%20of%20development&personTitles[]=VP&personLocations[]=United%20Kingdom&organizationIndustryTagIds[]=5567e1887369641d68d40100&contactEmailStatus[]=verified")
+        driver.quit()
+    except:
+        pass
     export()
     time.sleep(3)
