@@ -318,6 +318,7 @@ def filter(driver: uc.Chrome, query: str):
                         except:
                             pass
                 elif j == 7:
+                    time.sleep(100000)
                     industry = columns[7].find_element(By.CSS_SELECTOR, 'div.zp_paOF8 > span:first-child').text.split(',')[0]
                 elif j == 8:
                     sub_cols = columns[8].find_elements(By.CSS_SELECTOR, 'div.zp_HlgrG > span')
