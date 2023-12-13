@@ -333,6 +333,10 @@ def filter(driver: uc.Chrome, query: str):
                         WebDriverWait(driver, 2).until(
                             EC.presence_of_element_located((By.CSS_SELECTOR, 'div.apolloio-css-vars-reset div.apolloio-css-vars-reset h2'))
                         )
+                        element = WebDriverWait(driver, 2).until(
+                            EC.presence_of_element_located((By.CSS_SELECTOR, 'div.apolloio-css-vars-reset div.apolloio-css-vars-reset .mdi-close'))
+                        )
+                        element.click()
                         raise
                     except:
                         pass
