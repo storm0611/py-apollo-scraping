@@ -17,7 +17,7 @@ load_dotenv()
 # pids = []
 data = []
 TIMEOUT = 10
-filter_query = "personTitles[]=owner&personTitles[]=founder&personTitles[]=ceo&personTitles[]=director&personTitles[]=c%20suite&personTitles[]=partner&personTitles[]=head%20of%20sales&personTitles[]=cmo&personTitles[]=cfo&personTitles[]=head%20of%20marketing&personTitles[]=operations%20director&personTitles[]=vp%20of%20development&personTitles[]=VP&personLocations[]=United%20Kingdom&organizationIndustryTagIds[]=5567e1887369641d68d40100&contactEmailStatus[]=verified"
+filter_query = os.environ.get("FILTER_QUERY")
 
 def export():
     global data
@@ -105,6 +105,7 @@ def export_one(data):
         worksheet['N1'] = 'Employees'
         worksheet['O1'] = 'Industry'
         worksheet['P1'] = 'Keywords'
+        worksheet['Q1'] = 'Phone Number'
 
     start_row = worksheet.max_row + 1
 
@@ -124,6 +125,7 @@ def export_one(data):
     worksheet.cell(row=start_row, column=14).value = data["employees"]
     worksheet.cell(row=start_row, column=15).value = data["industry"]
     worksheet.cell(row=start_row, column=16).value = ",".join(data["keywords"])
+    worksheet.cell(row=start_row, column=17).value = data["phone_number"]
 
     # Save the workbook
     workbook.save(filepath)
@@ -228,105 +230,118 @@ def filter(driver: uc.Chrome, query: str):
             phone_number = "Not Found"
             keywords = []
             columns = element.find_elements(By.TAG_NAME, 'td')
-            for j in range(len(columns)):
-                if j == 0:
-                    for sub_col in columns[0].find_elements(By.TAG_NAME, 'a'):
-                        link = sub_col.get_attribute("href")
-                        if "linkedin.com" in link:
-                            person_linkedin = link
-                        else:
-                            person_link = link
-                            name = sub_col.text
-                            person_id = link.split("/")[-1].strip()
-                            if len(my_sqlite.select(pid=person_id)):
-                            # if person_id in pids:
-                                skip = 1
-                                break
-                            my_sqlite.insert(pid=person_id)
-                            # pids.append(person_id)
-                    if skip:
+    # for j in range(len(columns)):
+        # if j == 0:
+            if not len(columns):
+                continue
+            for sub_col in columns[0].find_elements(By.TAG_NAME, 'a'):
+                link = sub_col.get_attribute("href")
+                if "linkedin.com" in link:
+                    person_linkedin = link
+                else:
+                    person_link = link
+                    name = sub_col.text
+                    person_id = link.split("/")[-1].strip()
+                    if len(my_sqlite.select(pid=person_id)):
+                    # if person_id in pids:
+                        skip = 1
                         break
-                elif j == 1:
-                    title = columns[1].find_element(By.CSS_SELECTOR, 'span.zp_Y6y8d').text
-                elif j == 2:
-                    sub_col = columns[2].find_element(By.CSS_SELECTOR, 'div.zp_J1j17 a')
-                    company_link = sub_col.get_attribute("href")
-                    company_name = sub_col.text
-                    for sub_col in columns[2].find_elements(By.CSS_SELECTOR, 'div.zp_I1ps2 a'):
-                        link = sub_col.get_attribute("href")
-                        if "linkedin.com" in link:
-                            company_linkedin = link
-                        elif "twitter.com" in link:
-                            company_twitter = link
-                        elif "facebook.com" in link:
-                            company_facebook = link
-                        else:
-                            company_website = link
-                elif j == 3:
-                    pass
-                elif j == 4:
-                    location = columns[4].find_element(By.CSS_SELECTOR, 'span.zp_Y6y8d').text
-                elif j == 5:
-                    employees = columns[5].find_element(By.CSS_SELECTOR, 'span.zp_Y6y8d').text
-                elif j == 6:
+                    my_sqlite.insert(pid=person_id)
+                    # pids.append(person_id)
+            if skip:
+                break
+        # elif j == 1:
+            try:
+                title = columns[1].find_element(By.CSS_SELECTOR, 'span.zp_Y6y8d').text
+            except:
+                pass
+        # elif j == 2:
+            try:
+                sub_col = columns[2].find_element(By.CSS_SELECTOR, 'div.zp_J1j17 a')
+                company_link = sub_col.get_attribute("href")
+                company_name = sub_col.text
+                for sub_col in columns[2].find_elements(By.CSS_SELECTOR, 'div.zp_I1ps2 a'):
+                    link = sub_col.get_attribute("href")
+                    if "linkedin.com" in link:
+                        company_linkedin = link
+                    elif "twitter.com" in link:
+                        company_twitter = link
+                    elif "facebook.com" in link:
+                        company_facebook = link
+                    else:
+                        company_website = link
+            except:
+                pass
+        # elif j == 3:
+            # pass
+        # elif j == 4:
+            try:
+                location = columns[4].find_element(By.CSS_SELECTOR, 'span.zp_Y6y8d').text
+            except:
+                pass
+        # elif j == 5:
+            try:
+                employees = columns[5].find_element(By.CSS_SELECTOR, 'span.zp_Y6y8d').text
+            except:
+                pass
+        # elif j == 7:
+            try:
+                industry = columns[7].find_element(By.CSS_SELECTOR, 'div.zp_paOF8 > span').text.split(',')[0]
+            except:
+                pass
+        # elif j == 8:
+            try:
+                sub_cols = columns[8].find_elements(By.CSS_SELECTOR, 'div.zp_HlgrG > span')
+                if len(sub_cols):
+                    for sub_col in sub_cols:
+                        keyword = sub_col.text.replace(",", "")
+                        if keyword != "":
+                            keywords.append(keyword)
+            except:
+                pass
+        # elif j == 6:
+            try:
+                element = columns[6].find_element(By.CSS_SELECTOR, 'a.zp-link')
+                if "@" in element.text:
+                    email = element.text
+                else:
+                    phone_number = element.text
+                    button = columns[3].find_element(By.CSS_SELECTOR, 'button:first-child')
+                    button.click()
+                    time.sleep(3)
+                    try:
+                        element = WebDriverWait(driver, TIMEOUT).until(
+                            EC.presence_of_element_located((By.CSS_SELECTOR, 'div.apolloio-css-vars-reset div.apolloio-css-vars-reset span.zp_t08Bv'))
+                        )
+                        email = element.text
+                    except:
+                        pass
+            except:
+                try:
+                    button = columns[6].find_element(By.CSS_SELECTOR, 'button')
+                    button.find_element(By.CSS_SELECTOR, 'div[data-elem="button-label"]').text
+                    button.click()
+                    time.sleep(3)
                     try:
                         element = columns[6].find_element(By.CSS_SELECTOR, 'a.zp-link')
                         if "@" in element.text:
                             email = element.text
                         else:
                             phone_number = element.text
-                            button = columns[3].find_element(By.CSS_SELECTOR, 'button')
-                            try:
-                                button.find_element(By.CSS_SELECTOR, 'div[data-elem="button-label"]').text
-                            except:
-                                button.click()
-                                time.sleep(3)
-                                try:
-                                    element = WebDriverWait(driver, TIMEOUT).until(
-                                        EC.presence_of_element_located((By.CSS_SELECTOR, 'div.apolloio-css-vars-reset div.apolloio-css-vars-reset span.zp_t08Bv'))
-                                    )
-                                    email = element.text
-                                except:
-                                    pass
-                    except:
-                        button = columns[6].find_element(By.CSS_SELECTOR, 'button')
-                        try:
-                            button.find_element(By.CSS_SELECTOR, 'div[data-elem="button-label"]').text
+                            button = columns[3].find_element(By.CSS_SELECTOR, 'button:first-child')
                             button.click()
                             time.sleep(3)
                             try:
-                                element = columns[6].find_element(By.CSS_SELECTOR, 'a.zp-link')
-                                if "@" in element.text:
-                                    email = element.text
-                                else:
-                                    phone_number = element.text
-                                    button = columns[3].find_element(By.CSS_SELECTOR, 'button')
-                                    try:
-                                        button.find_element(By.CSS_SELECTOR, 'div[data-elem="button-label"]').text
-                                    except:
-                                        button.click()
-                                        time.sleep(3)
-                                        try:
-                                            element = WebDriverWait(driver, TIMEOUT).until(
-                                                EC.presence_of_element_located((By.CSS_SELECTOR, 'div.apolloio-css-vars-reset div.apolloio-css-vars-reset span.zp_t08Bv'))
-                                            )
-                                            email = element.text
-                                        except:
-                                            pass
+                                element = WebDriverWait(driver, TIMEOUT).until(
+                                    EC.presence_of_element_located((By.CSS_SELECTOR, 'div.apolloio-css-vars-reset div.apolloio-css-vars-reset span.zp_t08Bv'))
+                                )
+                                email = element.text
                             except:
                                 pass
-                        except:
-                            pass
-                elif j == 7:
-                    time.sleep(100000)
-                    industry = columns[7].find_element(By.CSS_SELECTOR, 'div.zp_paOF8 > span:first-child').text.split(',')[0]
-                elif j == 8:
-                    sub_cols = columns[8].find_elements(By.CSS_SELECTOR, 'div.zp_HlgrG > span')
-                    if len(sub_cols):
-                        for sub_col in sub_cols:
-                            keyword = sub_col.text.replace(",", "")
-                            if keyword != "":
-                                keywords.append(keyword)
+                    except:
+                        pass
+                except:
+                    pass
             if not skip:
                 export_one({
                     "person_id": person_id,
@@ -345,6 +360,7 @@ def filter(driver: uc.Chrome, query: str):
                     "employees": employees,
                     "industry": industry,
                     "keywords": keywords,
+                    "phone_number": phone_number,
                 })
                 # data.append({
                 #     "person_id": person_id,
@@ -381,10 +397,11 @@ def filter(driver: uc.Chrome, query: str):
                     "employees": employees,
                     "industry": industry,
                     "keywords": keywords,
+                    "phone_number": phone_number,
                 })
 
 if __name__ == "__main__":
-    while True:
+    # while True:
     # try:
         options = webdriver.ChromeOptions()
         options.headless = False
