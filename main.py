@@ -322,12 +322,20 @@ def filter(driver: uc.Chrome, query: str):
                         email = element.text
                     except:
                         pass
+                    button.click()
             except:
                 try:
-                    button = columns[6].find_element(By.CSS_SELECTOR, 'button')
+                    button = columns[6].find_element(By.CSS_SELECTOR, 'button:first-child')
                     button.find_element(By.CSS_SELECTOR, 'div[data-elem="button-label"]').text
                     button.click()
                     time.sleep(3)
+                    try:
+                        WebDriverWait(driver, 2).until(
+                            EC.presence_of_element_located((By.CSS_SELECTOR, 'div.apolloio-css-vars-reset div.apolloio-css-vars-reset h2'))
+                        )
+                        raise
+                    except:
+                        pass
                     try:
                         element = columns[6].find_element(By.CSS_SELECTOR, 'a.zp-link')
                         if "@" in element.text:
@@ -346,6 +354,7 @@ def filter(driver: uc.Chrome, query: str):
                                 pass
                     except:
                         pass
+                    button.click()
                 except:
                     pass
             if not skip:
