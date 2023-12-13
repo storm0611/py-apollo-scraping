@@ -83,6 +83,8 @@ def export_one(data):
 
     filename = 'data.xlsx'
     save_dir = './csv'
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
     filepath = os.path.join(save_dir, filename)
     if os.path.exists(filepath):
         workbook = openpyxl.load_workbook(filepath)
@@ -204,7 +206,6 @@ def filter(driver: uc.Chrome, query: str):
     i = 0
     while i <= max_page_num:
         i += 1
-        print("current page = ", i)
         driver.get(f"{url}&page={i}")
         element = WebDriverWait(driver, TIMEOUT).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, '.pipeline-tabs > a:first-child'))
@@ -213,6 +214,7 @@ def filter(driver: uc.Chrome, query: str):
         elements = WebDriverWait(driver, TIMEOUT).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, '.finder-results-list-panel-content table tbody tr'))
         )
+        print(f"current page: {i}, count: {len(elements)}")
         for element in elements:
             skip = 0
             person_id = "Not Found"
@@ -233,6 +235,7 @@ def filter(driver: uc.Chrome, query: str):
             phone_number = "Not Found"
             keywords = []
             columns = element.find_elements(By.TAG_NAME, 'td')
+            print(f"{len(columns)} Columns Found")
     # for j in range(len(columns)):
         # if j == 0:
             if not len(columns):
