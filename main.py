@@ -279,6 +279,21 @@ def filter(driver: uc.Chrome, query: str):
             except:
                 pass
         # elif j == 3:
+            button = columns[3].find_element(By.CSS_SELECTOR, 'button:first-child')
+            if "Access email" in button.find_element(By.CSS_SELECTOR, 'div[data-elem="button-label"]').text:
+                button.click()
+                time.sleep(3)
+            button = columns[3].find_element(By.CSS_SELECTOR, 'button:first-child')
+            button.click()
+            time.sleep(3)
+            try:
+                element = WebDriverWait(driver, TIMEOUT).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, 'div.apolloio-css-vars-reset div.apolloio-css-vars-reset span.zp_t08Bv'))
+                )
+                email = element.text
+            except:
+                pass
+            button.click()
             # pass
         # elif j == 4:
             try:
@@ -312,17 +327,17 @@ def filter(driver: uc.Chrome, query: str):
                     email = element.text
                 else:
                     phone_number = element.text
-                    button = columns[3].find_element(By.CSS_SELECTOR, 'button:first-child')
-                    button.click()
-                    time.sleep(3)
-                    try:
-                        element = WebDriverWait(driver, TIMEOUT).until(
-                            EC.presence_of_element_located((By.CSS_SELECTOR, 'div.apolloio-css-vars-reset div.apolloio-css-vars-reset span.zp_t08Bv'))
-                        )
-                        email = element.text
-                    except:
-                        pass
-                    button.click()
+                    # button = columns[3].find_element(By.CSS_SELECTOR, 'button:first-child')
+                    # button.click()
+                    # time.sleep(3)
+                    # try:
+                    #     element = WebDriverWait(driver, TIMEOUT).until(
+                    #         EC.presence_of_element_located((By.CSS_SELECTOR, 'div.apolloio-css-vars-reset div.apolloio-css-vars-reset span.zp_t08Bv'))
+                    #     )
+                    #     email = element.text
+                    # except:
+                    #     pass
+                    # button.click()
             except:
                 try:
                     button = columns[6].find_element(By.CSS_SELECTOR, 'button:first-child')
@@ -346,16 +361,16 @@ def filter(driver: uc.Chrome, query: str):
                             email = element.text
                         else:
                             phone_number = element.text
-                            button = columns[3].find_element(By.CSS_SELECTOR, 'button:first-child')
-                            button.click()
-                            time.sleep(3)
-                            try:
-                                element = WebDriverWait(driver, TIMEOUT).until(
-                                    EC.presence_of_element_located((By.CSS_SELECTOR, 'div.apolloio-css-vars-reset div.apolloio-css-vars-reset span.zp_t08Bv'))
-                                )
-                                email = element.text
-                            except:
-                                pass
+                            # button = columns[3].find_element(By.CSS_SELECTOR, 'button:first-child')
+                            # button.click()
+                            # time.sleep(3)
+                            # try:
+                            #     element = WebDriverWait(driver, TIMEOUT).until(
+                            #         EC.presence_of_element_located((By.CSS_SELECTOR, 'div.apolloio-css-vars-reset div.apolloio-css-vars-reset span.zp_t08Bv'))
+                            #     )
+                            #     email = element.text
+                            # except:
+                            #     pass
                     except:
                         pass
                     button.click()
