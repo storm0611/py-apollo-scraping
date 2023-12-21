@@ -109,6 +109,8 @@ def export_one(data):
         worksheet['O1'] = 'Industry'
         worksheet['P1'] = 'Keywords'
         worksheet['Q1'] = 'Phone Number'
+        worksheet['R1'] = 'Phone'
+        worksheet['S1'] = 'Personal Emails'
 
     start_row = worksheet.max_row + 1
 
@@ -129,6 +131,8 @@ def export_one(data):
     worksheet.cell(row=start_row, column=15).value = data["industry"]
     worksheet.cell(row=start_row, column=16).value = ",".join(data["keywords"])
     worksheet.cell(row=start_row, column=17).value = data["phone_number"]
+    worksheet.cell(row=start_row, column=18).value = data["phone"]
+    worksheet.cell(row=start_row, column=19).value = ",".join(data["personal_emails"])
 
     # Save the workbook
     workbook.save(filepath)
